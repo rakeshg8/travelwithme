@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Find Travel Groups | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h2>Find a Travel Group</h2>
+    <a href="/dashboard">← Back to Dashboard</a>
+    
+    <form method="GET" action="/groups">
+      <input type="text" name="destination" placeholder="Search by Destination" value="<%= destination %>">
+      <input type="date" name="date" value="<%= date %>">
+      <button type="submit">Search</button>
+    </form>
+    
+  <% if (groups.length === 0) { %>
+    <p>No available groups to join right now.</p>
+  <% } else { %>
+    <ul>
+      <% groups.forEach(group => { %>
+        <li>
+          <strong><%= group.name %></strong> - Destination: <%= group.destination %> 
+          on <%= group.date.toDateString() %>
+          <form method="POST" action="/groups/join/<%= group._id %>" style="display:inline;">
+            <button type="submit">Join</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Group Chat | <%= group.name %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .message-box { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
+    .own { background: #dcf8c6; }
+    .other { background: #f1f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Group Chat: <%= group.name %></h2>
+  <a href="/dashboard">← Back to Dashboard</a>
+
+  <div>
+    <% messages.forEach(msg => { %>
+      <div class="message-box <%= msg.sender._id.toString() === userId.toString() ? 'own' : 'other' %>">
+        <strong><%= msg.sender.name %></strong>: <%= msg.content %> <br>
+        <small><%= msg.timestamp.toLocaleString() %></small>
+      </div>
+    <% }) %>
+  </div>
+
+  <form method="POST" action="/groups/<%= group._id %>/chat">
+    <input name="content" placeholder="Type your message..." required>
+    <button type="submit">Send</button>
+  </form>
+</body>
+</html>

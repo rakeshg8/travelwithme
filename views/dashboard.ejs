@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌍 TravelWithMe</h1>
+      <p>Welcome, <strong><%= user.name %></strong>!</p>
+      <nav>
+        <a href="/groups">🔍 Browse Groups</a>
+        <a href="/logout">🚪 Logout</a>
+        <a href="/profile">👤 Profile</a>
+        <a href="/notifications">🔔 Notifications</a>
+
+      </nav>
+    </header>
+
+    <section class="create-group">
+      <h2>➕ Create New Travel Group</h2>
+      <form method="POST" action="/groups/create">
+        <input name="name" placeholder="Group Name" required>
+        <input name="destination" placeholder="Destination" required>
+        <input type="date" name="date" required>
+        <button type="submit">Create</button>
+      </form>
+    </section>
+
+    <section class="my-groups">
+      <h2>👥 Your Travel Groups</h2>
+      <% if (groups.length === 0) { %>
+        <p>You haven't joined any groups yet.</p>
+      <% } else { %>
+        <ul>
+          <% groups.forEach(group => { %>
+            <li>
+              <strong><%= group.name %></strong> - <%= group.destination %> 
+              (<%= group.date ? group.date.toDateString() : "Date not set" %>) |
+              <a href="/groups/<%= group._id %>/chat">💬 Chat</a>
+        
+              <% if (group.createdBy && group.createdBy.toString() === user._id.toString()) { %>
+                <form action="/groups/<%= group._id %>/delete" method="POST" style="display:inline;">
+                  <button type="submit" onclick="return confirm('Are you sure?')">🗑️ Delete</button>
+                </form>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+        
+      <% } %>
+    </section>
+  </div>
+</body>
+</html>
