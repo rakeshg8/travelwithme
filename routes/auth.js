@@ -58,4 +58,14 @@ router.post('/:id/delete', async (req, res) => {
   await TravelGroup.findByIdAndDelete(groupId);
   res.redirect('/dashboard');
 });
+router.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.redirect('/dashboard');
+    }
+    res.clearCookie('connect.sid'); // clear session cookie
+    res.redirect('/login');
+  });
+});
 module.exports = router;
