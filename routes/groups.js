@@ -10,7 +10,7 @@ router.post('/groups/create', async (req, res) => {
   const newGroup = await TravelGroup.create({
     name,
     destination,
-    date,
+   date: new Date(date),
     createdBy: req.session.userId,
     members: [req.session.userId]
   });
@@ -104,5 +104,25 @@ router.get('/groups', async (req, res) => {
   
     res.redirect('/dashboard');
   });
-  
+
+// DELETE group
+router.post('/:id/delete', async (req, res) => {
+  try {
+    const group = await TravelGroup.findById(req.params.id);
+    if (!group) {
+      return res.status(404).send('Group not found');
+    }
+
+    // Check if the logged-in user is the creator
+    if (group.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).send('You are not authorized to delete this group');
+    }
+
+    await TravelGroup.findByIdAndDelete(req.params.id);
+    res.redirect('/dashboard'); // or wherever the dashboard is
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 module.exports = router;
