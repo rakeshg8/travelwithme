@@ -60,13 +60,46 @@ router.post('/groups/:id/chat', async (req, res) => {
   const groupId = req.params.id;
   const { text } = req.body;
 
-  await Message.create({
-    group: groupId,
-    sender: req.session.userId,
-    text
-  });
+  if (!req.session.userId) return res.redirect('/login'); // Ensure user is logged in
 
-  res.redirect(`/groups/${groupId}/chat`);
+  try {
+    await Message.create({
+      group: groupId,
+      sender: req.session.userId,
+      text
+    });
+
+    res.redirect(`/groups/${groupId}/chat`);
+  } catch (error) {
+    console.error('Message creation failed:', error);
+    res.status(500).send('Failed to send message');
+  }
+});
+
+
+router.get('/groups/:id/chat', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+
+  const groupId = req.params.id;
+  const userId = req.session.userId;
+
+  const group = await TravelGroup.findById(groupId).populate('members');
+  if (!group) return res.status(404).send("Group not found");
+
+  // Ensure user is a member of the group
+  const isMember = group.members.some(member => member._id.toString() === userId.toString());
+  if (!isMember) return res.status(403).send("You are not a member of this group");
+
+  // Load messages with sender populated
+  const messages = await Message.find({ group: groupId })
+    .populate('sender')
+    .sort({ timestamp: 1 });
+
+  res.render('chat', {
+    group,
+    messages,
+    userId
+  });
 });
 
 // Show all available travel groups
