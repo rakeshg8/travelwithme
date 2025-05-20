@@ -154,19 +154,14 @@
       <nav class="nav-links">
         <a href="/groups">🔍 Browse Groups</a>
         <a href="/profile">👤 Profile</a>
-        <a href="/notifications">🔔 Notifications</a>
+        <a href="/notifications">🔔 Notifications (<%= notifications.length %>)</a>
         <a href="/logout">🚪 Logout</a>
       </nav>
     </header>
 
     <section class="create-group">
-      <h2>➕ Create a New Travel Group</h2>
-      <form method="POST" action="/groups/create">
-        <input name="name" placeholder="Group Name" required>
-        <input name="destination" placeholder="Destination" required>
-        <input type="date" name="date" required>
-        <button type="submit">Create Group</button>
-      </form>
+     <h2>➕ Want to start a new travel group?</h2>
+  <a href="/groups/create" class="nav-links" style="display: inline-block; padding: 10px 20px; background: #0077cc; color: white; border-radius: 10px; text-decoration: none;">Create Group</a>
     </section>
 
     <section class="my-groups">
@@ -181,6 +176,8 @@
               Destination: <strong><%= group.destination %></strong><br>
               Date: <%= group.date ? group.date.toDateString() : "Not set" %>
             </div>
+           
+
             <div class="group-actions">
               <a href="/groups/<%= group._id %>/chat">💬 Chat</a>
               <% if (group.createdBy && group.createdBy.toString() === user._id.toString()) { %>
