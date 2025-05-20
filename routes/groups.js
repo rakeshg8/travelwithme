@@ -7,6 +7,10 @@ const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 router.post('/groups/create', async (req, res) => {
   const { name, destination, date } = req.body;
+  const allowedCities = require('../public/data/indian_cities.json');
+if (!allowedCities.includes(destination)) {
+  return res.send("❌ Invalid city. Please choose from the suggestions.");
+}
   const newGroup = await TravelGroup.create({
     name,
     destination,
@@ -17,15 +21,9 @@ router.post('/groups/create', async (req, res) => {
   res.redirect('/dashboard');
 });
 
-
-// View chat page for a group
-router.get('/groups/:id/chat', async (req, res) => {
-  const groupId = req.params.id;
-
-  const group = await TravelGroup.findById(groupId);
-  const messages = await Message.find({ group: groupId }).populate('sender');
-
-  res.render('chat', { group, messages, userId: req.session.userId });
+router.get('/groups/create', (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+  res.render('create-group');
 });
 
 
@@ -36,23 +34,78 @@ router.post('/groups/join/:id', async (req, res) => {
 
   const group = await TravelGroup.findById(groupId).populate('members');
 
-  const userAlreadyJoined = group.members.some(m => m._id.equals(userId));
-  if (!userAlreadyJoined) {
-    group.members.push(userId);
-    await group.save();
+  
+  if (!group) return res.status(404).send("Group not found");
 
-    // Notify group members (excluding the new user)
-    for (const member of group.members) {
-      if (!member._id.equals(userId)) {
-        await Notification.create({
-          user: member._id,
-          message: `🚨 ${req.session.userName} joined your group "${group.name}"!`
-        });
-      }
-    }
+  if (
+    group.members.includes(userId) ||
+    group.pendingRequests.includes(userId)
+  ) {
+    return res.send("Already joined or requested.");
   }
 
+  group.pendingRequests.push(userId);
+  await group.save();
+
+  res.send("✅ Request sent. Waiting for approval from group admin.");
+
   res.redirect('/dashboard');
+});
+// view group details with member management for admins
+ router.get('/groups/:id/details', async (req, res) => {
+  const group = await TravelGroup.findById(req.params.id)
+    .populate('members')
+    .populate('pendingRequests')
+    .populate('createdBy');
+
+  if (!group) return res.status(404).send('Group not found');
+
+  const isAdmin = group.createdBy._id.toString() === req.session.userId;
+
+
+  if (!isAdmin) return res.status(403).send('Not authorized');
+
+  res.render('group-details', { group, userId: req.session.userId });
+});
+// Approve member
+router.post('/groups/:groupId/approve/:userId', async (req, res) => {
+  const { groupId, userId } = req.params;
+
+  const group = await TravelGroup.findById(groupId);
+  if (!group) return res.status(404).send('Group not found');
+
+  if (group.createdBy.toString() !== req.session.userId) {
+    return res.status(403).send('Not authorized');
+  }
+
+  group.members.push(userId);
+  group.pendingRequests = group.pendingRequests.filter(
+    id => id.toString() !== userId
+  );
+  await group.save();
+
+  res.redirect(`/groups/${groupId}/details`);
+});
+
+// Remove member with reason
+router.post('/groups/:groupId/remove/:userId', async (req, res) => {
+  const { groupId, userId } = req.params;
+  const { reason } = req.body;
+
+  const group = await TravelGroup.findById(groupId);
+  if (!group) return res.status(404).send('Group not found');
+
+  if (group.createdBy.toString() !== req.session.userId) {
+    return res.status(403).send('Not authorized');
+  }
+
+  group.members = group.members.filter(id => id.toString() !== userId);
+  await group.save();
+
+  // Notify or log reason if needed
+  console.log(`User ${userId} removed for reason: ${reason}`);
+
+  res.redirect(`/groups/${groupId}/details`);
 });
 
 // Send a message
@@ -122,21 +175,6 @@ router.get('/groups', async (req, res) => {
   });
   
   
-  // Join a group
-  router.post('/groups/join/:id', async (req, res) => {
-    const groupId = req.params.id;
-    const userId = req.session.userId;
-  
-    const group = await TravelGroup.findById(groupId);
-  
-    // Prevent duplicate joins
-    if (!group.members.includes(userId)) {
-      group.members.push(userId);
-      await group.save();
-    }
-  
-    res.redirect('/dashboard');
-  });
 
 // DELETE group
 router.post('/:id/delete', async (req, res) => {
@@ -147,7 +185,7 @@ router.post('/:id/delete', async (req, res) => {
     }
 
     // Check if the logged-in user is the creator
-    if (group.createdBy.toString() !== req.user._id.toString()) {
+    if (group.createdBy.toString() !== req.session.user._id.toString()) {
       return res.status(403).send('You are not authorized to delete this group');
     }
 
