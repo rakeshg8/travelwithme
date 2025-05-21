@@ -128,48 +128,65 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔐 Group: <%= group.name %></h1>
-    <h3>📍 Destination: <%= group.destination %> | 📅 Date: <%= group.date.toDateString() %></h3>
 
-    <section>
-      <h2>🟡 Pending Join Requests</h2>
-      <% if (group.pendingRequests.length === 0) { %>
-        <p class="empty-message">No pending requests</p>
-      <% } else { %>
-        <ul>
-          <% group.pendingRequests.forEach(user => { %>
-            <li>
-              <div class="user-info"><%= user.name %> - <%= user.email %></div>
-              <form method="POST" action="/groups/<%= group._id %>/approve/<%= user._id %>">
-                <button type="submit">✅ Approve</button>
-              </form>
-            </li>
-          <% }) %>
-        </ul>
-      <% } %>
-    </section>
+  <h1>👑 Group : <%= group.name %></h1>
+  <h3>📍 Destination: <%= group.destination %> | 📅 Date: <%= group.date.toDateString() %></h3>
 
-    <section>
-      <h2>✅ Approved Members</h2>
-      <% if (group.members.length === 0) { %>
-        <p class="empty-message">No approved members yet</p>
-      <% } else { %>
-        <ul>
-          <% group.members.forEach(user => { %>
-            <li>
-              <div class="user-info"><%= user.name %> - <%= user.email %></div>
-              <% if (user._id.toString() !== userId.toString()) { %>
-                <form method="POST" action="/groups/<%= group._id %>/remove/<%= user._id %>">
-                  <input name="reason" placeholder="Reason" required>
-                  <button type="submit" class="remove">❌ Remove</button>
-                </form>
-              <% } %>
-            </li>
-          <% }) %>
-        </ul>
-      <% } %>
-    </section>
+  <section>
+    <h2>🟡 Pending Requests</h2>
+    <% if (group.pendingRequests.length === 0) { %>
+      <p>No pending requests</p>
+    <% } else { %>
+      <ul>
+        <% group.pendingRequests.forEach(user => { %>
+          <li>
+            <strong><%= user.name %></strong> - <%= user.email %>
+            <form method="POST" action="/groups/<%= group._id %>/approve/<%= user._id %>">
+              <button type="submit">✅ Approve</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+
+  <section>
+    <h2>✅ Approved Members</h2>
+    <input id="searchInput" class="search-bar" type="text" placeholder="Search members..." onkeyup="filterUsers()">
+    <ul class="member-list">
+      <% group.members.forEach(user => { %>
+        <li>
+          <%= user.name %> - <%= user.email %>
+          <button onclick="alert('This would open a message modal to <%= user.name %>')">💬 Message</button>
+          <% if (user._id.toString() !== userId.toString()) { %>
+            <form method="POST" action="/groups/<%= group._id %>/remove/<%= user._id %>" style="display:inline;">
+              <input name="reason" placeholder="Reason for removal" required>
+              <button class="remove-btn" type="submit">❌ Remove</button>
+            </form>
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🧾 Admin Action Logs</h2>
+    <% if (logs.length === 0) { %>
+      <p>No actions recorded yet.</p>
+    <% } else { %>
+      <% logs.forEach(log => { %>
+        <div class="log-box">
+          <strong><%= log.action === 'approve' ? '✅ Approved' : '❌ Removed' %></strong>
+          <%= log.targetUser.name %> by <%= log.admin.name %>
+          <% if (log.reason) { %> — Reason: "<%= log.reason %>" <% } %><br>
+          <small><%= new Date(log.timestamp).toLocaleString() %></small>
+        </div>
+      <% }) %>
+    <% } %>
+  </section>
+
+ <a href="/groups/<%= group._id %>/recommendations" class="back-link">🌟 View Recommendations</a>
+
 
     <a href="/dashboard" class="back-link">← Back to Dashboard</a>
   </div>
