@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Recommendations | <%= group.destination %></title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <h2>📍 Recommendations near <%= group.destination %></h2>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([<%= lat %>, <%= lon %>], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+   async function fetchPOIs(query, icon, label) {
+  const overpassUrl = "https://overpass-api.de/api/interpreter";
+  const lat = <%= lat %>;
+  const lon = <%= lon %>;
+  const delta = 0.02;
+  const bbox = `${lat - delta},${lon - delta},${lat + delta},${lon + delta}`;
+
+  const queryBody = `
+    [out:json][timeout:25];
+    (
+      node[${query}](${bbox});
+      way[${query}](${bbox});
+      relation[${query}](${bbox});
+    );
+    out center;
+  `.trim(); // 👈 Trim to remove leading/trailing whitespace
+
+  try {
+    const res = await fetch(overpassUrl, {
+      method: "POST",
+      body: queryBody,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    });
+
+    const data = await res.json();
+
+    data.elements.forEach(el => {
+      const lat = el.lat || el.center?.lat;
+      const lon = el.lon || el.center?.lon;
+      const name = el.tags?.name || label;
+
+      if (lat && lon) {
+        L.marker([lat, lon])
+          .addTo(map)
+          .bindPopup(`<strong>${icon} ${name}</strong><br>${label}`);
+      }
+    });
+
+  } catch (err) {
+    console.error(`❌ Failed to fetch ${label}:`, err);
+  }
+}
+
+    fetchPOIs('"amenity"="restaurant"', '🍽️', 'Restaurant');
+    fetchPOIs('"tourism"="hotel"', '🏨', 'Hotel');
+    fetchPOIs('"amenity"="taxi"', '🚕', 'Taxi Stand');
+  </script>
+</body>
+</html>
