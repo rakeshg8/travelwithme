@@ -51,13 +51,17 @@ router.post('/groups/join/:id', async (req, res) => {
 
   res.redirect('/dashboard');
 });
+const GroupLog = require('../models/GroupLog');
 // view group details with member management for admins
  router.get('/groups/:id/details', async (req, res) => {
   const group = await TravelGroup.findById(req.params.id)
     .populate('members')
     .populate('pendingRequests')
     .populate('createdBy');
-
+ const logs = await GroupLog.find({ group: group._id })
+    .populate('admin')
+    .populate('targetUser')
+    .sort({ timestamp: -1 });
   if (!group) return res.status(404).send('Group not found');
 
   const isAdmin = group.createdBy._id.toString() === req.session.userId;
@@ -65,7 +69,11 @@ router.post('/groups/join/:id', async (req, res) => {
 
   if (!isAdmin) return res.status(403).send('Not authorized');
 
-  res.render('group-details', { group, userId: req.session.userId });
+   res.render('group-details', {
+    group,
+    userId: req.session.userId,
+    logs
+  });
 });
 // Approve member
 router.post('/groups/:groupId/approve/:userId', async (req, res) => {
@@ -83,6 +91,13 @@ router.post('/groups/:groupId/approve/:userId', async (req, res) => {
     id => id.toString() !== userId
   );
   await group.save();
+await GroupLog.create({
+  group: groupId,
+  action: "approve",
+  admin: req.session.userId,
+  targetUser: userId,
+  timestamp: new Date()
+});
 
   res.redirect(`/groups/${groupId}/details`);
 });
@@ -101,6 +116,14 @@ router.post('/groups/:groupId/remove/:userId', async (req, res) => {
 
   group.members = group.members.filter(id => id.toString() !== userId);
   await group.save();
+await GroupLog.create({
+  group: groupId,
+  action: "remove",
+  admin: req.session.userId,
+  targetUser: userId,
+  reason,
+  timestamp: new Date()
+});
 
   // Notify or log reason if needed
   console.log(`User ${userId} removed for reason: ${reason}`);
@@ -128,6 +151,7 @@ router.post('/groups/:id/chat', async (req, res) => {
     res.status(500).send('Failed to send message');
   }
 });
+
 
 
 router.get('/groups/:id/chat', async (req, res) => {
