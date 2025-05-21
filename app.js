@@ -33,7 +33,8 @@ app.use((req, res, next) => {
 app.use('/', authRoutes);
 app.use('/', groupRoutes);
 app.use('/', profileRoutes);
-
+const recommendationRoutes = require('./routes/recommendations');
+app.use('/', recommendationRoutes);
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
