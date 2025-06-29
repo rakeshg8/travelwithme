@@ -220,4 +220,68 @@ router.post('/:id/delete', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+const Guide = require('../models/Guide');
+const GuideBooking = require('../models/GuideBooking');
+
+// Show available guides
+router.get('/groups/:id/book-guide', async (req, res) => {
+  const group = await TravelGroup.findById(req.params.id);
+  if (!group) return res.status(404).send('Group not found');
+
+  const destination = group.destination;
+  const guides = await Guide.find({ city: destination, available: true });
+
+  // ✅ Fetch current user's guide bookings for this group
+  const bookings = await GuideBooking.find({
+    user: req.session.userId,
+    group: group._id
+  }).populate('guide').populate('group');
+
+  res.render('guide', {
+    guides,
+    destination,
+    groupId: group._id,
+    bookings // ✅ pass to the view
+  });
+});
+router.post('/groups/:groupId/book-guide/:guideId', async (req, res) => {
+  const { groupId, guideId } = req.params;
+
+  const guide = await Guide.findById(guideId);
+  if (!guide || !guide.available) return res.send("❌ Guide is not available.");
+
+  guide.available = false;
+  await guide.save();
+
+  await GuideBooking.create({
+    group: groupId,
+    user: req.session.userId,
+    guide: guideId
+  });
+
+  res.send(`✅ Guide ${guide.name} has been booked!`);
+});
+router.get('/my-guide-bookings', async (req, res) => {
+  const bookings = await GuideBooking.find({ user: req.session.userId })
+    .populate('guide')
+    .populate('group');
+
+  res.render('my-guide-bookings', { bookings });
+});
+router.post('/bookings/:bookingId/rate', async (req, res) => {
+  const { rating, review } = req.body;
+  const booking = await GuideBooking.findById(req.params.bookingId);
+
+  if (!booking || booking.user.toString() !== req.session.userId) {
+    return res.status(403).send("Not authorized to rate this booking.");
+  }
+
+  booking.rating = rating;
+  booking.review = review;
+  booking.completed = true;
+  await booking.save();
+
+  res.redirect('/my-guide-bookings');
+});
+
 module.exports = router;

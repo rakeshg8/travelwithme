@@ -19,14 +19,11 @@ router.post('/profile', async (req, res) => {
   res.redirect('/profile');
 });
 const Notification = require('../models/Notification');
-
-
 router.get('/notifications', async (req, res) => {
   const notifications = await Notification.find({ user: req.session.userId })
     .sort({ timestamp: -1 });
   res.render('notifications', { notifications });
 });
-
 router.post('/notifications/read/:id', async (req, res) => {
   await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
   res.redirect('/notifications');

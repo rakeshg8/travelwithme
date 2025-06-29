@@ -30,18 +30,22 @@ app.use((req, res, next) => {
 });
 
 // Routes
+const adminRoutes = require('./routes/admin');
+app.use('/', adminRoutes);
+
 app.use('/', authRoutes);
 app.use('/', groupRoutes);
 app.use('/', profileRoutes);
 const recommendationRoutes = require('./routes/recommendations');
 app.use('/', recommendationRoutes);
+
+
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('MongoDB Connected');
-  app.listen(process.env.PORT, () => {
+require('dotenv').config();
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {console.log("MongoDB Atlas Connected");
+    app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:${process.env.PORT}`);
   });
-}).catch(err => console.log(err));
+  })
+  .catch(err => console.log("MongoDB Connection Error: ", err));
