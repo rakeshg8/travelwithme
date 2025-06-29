@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notifications | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 Notifications</h1>
+    <a href="/dashboard">← Back to Dashboard</a>
+    
+    <% if (notifications.length === 0) { %>
+      <p>No notifications yet.</p>
+    <% } else { %>
+      <ul>
+        <% notifications.forEach(note => { %>
+          <li style="margin-bottom:10px;">
+            <% if (!note.isRead) { %>
+              <strong>[NEW]</strong>
+            <% } %>
+            <%= note.message %> <br>
+            <small><%= note.timestamp.toLocaleString() %></small>
+            <% if (!note.isRead) { %>
+              <form method="POST" action="/notifications/read/<%= note._id %>" style="display:inline;">
+                <button type="submit">Mark as Read</button>
+              </form>
+            <% } %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</body>
+</html>

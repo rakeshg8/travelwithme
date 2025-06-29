@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Group | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f8fcff, #dceefb);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #0077cc;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, button {
+      padding: 12px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    #suggestions {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border: 1px solid #ccc;
+      max-height: 180px;
+      overflow-y: auto;
+      background: white;
+      position: absolute;
+      z-index: 999;
+      width: 92%;
+    }
+
+    #suggestions li {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    #suggestions li:hover {
+      background: #f0f0f0;
+    }
+
+    .location-btn {
+      color: #d63031;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: -10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>➕ Create a New Travel Group</h2>
+    <form method="POST" action="/groups/create" onsubmit="return validateCity()">
+      <input name="name" placeholder="Group Name" required>
+      
+      <div style="position: relative;">
+        <input id="destination" name="destination" placeholder="Start typing a city..." autocomplete="off" required>
+        <ul id="suggestions"></ul>
+      </div>
+
+      <div class="location-btn" onclick="detectLocation()">📍 Detect my location</div>
+
+      <input type="date" name="date" required>
+      <button type="submit">Create Group</button>
+    </form>
+  </div>
+
+  <script>
+    let cities = [];
+
+    // Load city list
+    async function loadCities() {
+      const res = await fetch("/data/indian_cities.json");
+      cities = await res.json();
+    }
+
+    // Setup autocomplete
+    function setupAutocomplete() {
+      const input = document.getElementById("destination");
+      const suggestionBox = document.getElementById("suggestions");
+
+      input.addEventListener("input", () => {
+        const value = input.value.toLowerCase();
+        suggestionBox.innerHTML = "";
+
+        if (!value) return;
+
+        const matches = cities
+          .filter(city => city.toLowerCase().startsWith(value))
+          .slice(0, 8);
+
+        matches.forEach(city => {
+          const li = document.createElement("li");
+          li.textContent = city;
+          li.onclick = () => {
+            input.value = city;
+            suggestionBox.innerHTML = "";
+          };
+          suggestionBox.appendChild(li);
+        });
+      });
+
+      document.addEventListener("click", e => {
+        if (!suggestionBox.contains(e.target)) {
+          suggestionBox.innerHTML = "";
+        }
+      });
+    }
+
+    // Validate city on submit
+    function validateCity() {
+      const val = document.getElementById("destination").value;
+      if (!cities.includes(val)) {
+        alert("❌ Please select a valid city from the list.");
+        return false;
+      }
+      return true;
+    }
+
+    // Detect location using Geolocation + OpenCage
+    async function detectLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=819c431f8dbc44f39fa315ad2ba6ce45`);
+        const data = await response.json();
+        const components = data.results[0]?.components;
+        const city = components.city || components.town || components.village || components.state_district;
+
+        if (cities.includes(city)) {
+          document.getElementById("destination").value = city;
+        } else {
+          alert("⚠️ Location detected, but city not in allowed list.");
+        }
+      }, err => {
+        alert("Failed to get your location.");
+      });
+    }
+
+    window.onload = async () => {
+      await loadCities();
+      setupAutocomplete();
+    };
+  </script>
+</body>
+</html>

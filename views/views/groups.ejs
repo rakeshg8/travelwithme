@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Find Travel Groups | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #dfe9f3, #ffffff);
+      margin: 0;
+      padding: 0;
+      animation: fadeInBody 1s ease-in;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2.2em;
+      color: #0077cc;
+      margin-bottom: 30px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #0077cc;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #005fa3;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    form input, form button {
+      padding: 12px 15px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    form button {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    form button:hover {
+      background-color: #005fa3;
+    }
+
+    .group-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .group-card {
+      background: #f1f9ff;
+      border-left: 5px solid #0077cc;
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .group-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .group-name {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #0077cc;
+    }
+
+    .group-info {
+      margin-top: 5px;
+      font-size: 0.95em;
+      color: #333;
+    }
+
+    .group-card form {
+      margin-top: 12px;
+    }
+
+    .group-card button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .group-card button:hover {                                                                
+      background-color: #218838;
+    }
+
+    .no-groups {
+      text-align: center;
+      font-size: 1.1em;
+      color: #666;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+    <h2>🌎 Find a Travel Group</h2>
+
+    <form method="GET" action="/groups">
+      <input type="text" name="destination" placeholder="Search by Destination" value="<%= destination %>">
+      <input type="date" name="date" value="<%= date %>">
+      <button type="submit">Search</button>
+    </form>
+
+    <% if (groups.length === 0) { %>
+      <p class="no-groups">🚫 No available groups to join right now. Try adjusting your search filters.</p>
+    <% } else { %>
+      <div class="group-list">
+        <% groups.forEach(group => { %>
+          <div class="group-card">
+            <div class="group-name"><%= group.name %></div>
+            <div class="group-info">
+              Destination: <strong><%= group.destination %></strong><br>
+              Date: <%= group.date ? group.date.toDateString() : 'Date not set' %>
+            </div>
+            <form method="POST" action="/groups/join/<%= group._id %>">
+              <button type="submit">Join Group</button>
+            </form>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

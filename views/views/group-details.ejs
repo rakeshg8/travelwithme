@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Group Admin Panel | <%= group.name %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: linear-gradient(to right, #dbeafe, #f0f9ff);
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2em;
+      color: #1d4ed8;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #555;
+    }
+
+    section {
+      margin-top: 40px;
+    }
+
+    section h2 {
+      color: #2563eb;
+      border-bottom: 2px solid #c7d2fe;
+      padding-bottom: 6px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f8fafc;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .user-info {
+      font-weight: 500;
+      margin-right: 15px;
+      flex-grow: 1;
+    }
+
+    form {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="text"], input[name="reason"] {
+      padding: 8px 12px;
+      font-size: 0.9em;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 8px 14px;
+      font-size: 0.9em;
+      background-color: #3b82f6;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+
+    button.remove {
+      background-color: #ef4444;
+    }
+
+    button.remove:hover {
+      background-color: #b91c1c;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: #1e3a8a;
+    }
+
+    .empty-message {
+      font-style: italic;
+      color: #666;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👑 Group : <%= group.name %></h1>
+  <h3>📍 Destination: <%= group.destination %> | 📅 Date: <%= group.date.toDateString() %></h3>
+
+  <section>
+    <h2>🟡 Pending Requests</h2>
+    <% if (group.pendingRequests.length === 0) { %>
+      <p>No pending requests</p>
+    <% } else { %>
+      <ul>
+        <% group.pendingRequests.forEach(user => { %>
+          <li>
+            <strong><%= user.name %></strong> - <%= user.email %>
+            <form method="POST" action="/groups/<%= group._id %>/approve/<%= user._id %>">
+              <button type="submit">✅ Approve</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+
+  <section>
+    <h2>✅ Approved Members</h2>
+    <input id="searchInput" class="search-bar" type="text" placeholder="Search members..." onkeyup="filterUsers()">
+    <ul class="member-list">
+      <% group.members.forEach(user => { %>
+        <li>
+          <%= user.name %> - <%= user.email %>
+          <button onclick="alert('This would open a message modal to <%= user.name %>')">💬 Message</button>
+          <% if (user._id.toString() !== userId.toString()) { %>
+            <form method="POST" action="/groups/<%= group._id %>/remove/<%= user._id %>" style="display:inline;">
+              <input name="reason" placeholder="Reason for removal" required>
+              <button class="remove-btn" type="submit">❌ Remove</button>
+            </form>
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🧾 Admin Action Logs</h2>
+    <% if (logs.length === 0) { %>
+      <p>No actions recorded yet.</p>
+    <% } else { %>
+      <% logs.forEach(log => { %>
+        <div class="log-box">
+          <strong><%= log.action === 'approve' ? '✅ Approved' : '❌ Removed' %></strong>
+          <%= log.targetUser.name %> by <%= log.admin.name %>
+          <% if (log.reason) { %> — Reason: "<%= log.reason %>" <% } %><br>
+          <small><%= new Date(log.timestamp).toLocaleString() %></small>
+        </div>
+      <% }) %>
+    <% } %>
+  </section>
+
+ <a href="/groups/<%= group._id %>/recommendations" class="back-link">🌟 View Recommendations</a>
+ <br>
+ <a href="/groups/<%= group._id %>/book-guide" class="back-link">🧭 Book a Guide</a>
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+  </div>
+</body>
+</html>

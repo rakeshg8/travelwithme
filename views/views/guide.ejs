@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book a Guide</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dbeafe, #f0f9ff);
+      padding: 40px;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    h1 { color: #1d4ed8; }
+    .guide-card {
+      border: 1px solid #ccc;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .guide-card h3 {
+      margin-top: 0;
+    }
+    .guide-card button {
+      background-color: #007bff;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .guide-card button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📍 Available Guides in <%= destination %></h1>
+
+    <% if (guides.length === 0) { %>
+      <p>No guides available in this location.</p>
+    <% } else { %>
+      <% guides.forEach(guide => { %>
+        <div class="guide-card">
+          <h3><%= guide.name %></h3>
+          <p>Email: <%= guide.email %></p>
+          <p>Phone: <%= guide.phone %></p>
+          <p>Experience: <%= guide.experience %></p>
+          <p>Price Per Day: ₹<%= guide.pricePerDay %></p>
+          <form method="POST" action="/groups/<%= groupId %>/book-guide/<%= guide._id %>">
+            <button type="submit">Book Guide</button>
+          </form>
+        </div>
+      <% }) %>
+    <% } %>
+<h2>📖 Your Guide Booking History</h2>
+<% if (bookings.length === 0) { %>
+  <p>No previous guide bookings yet.</p>
+<% } else { %>
+  <% bookings.forEach(booking => { %>
+    <div class="booking-card">
+      <p><strong>Guide:</strong> <%= booking.guide.name %></p>
+      <p><strong>Group:</strong> <%= booking.group.name %></p>
+      <p><strong>Booked On:</strong> <%= new Date(booking.bookingDate).toLocaleDateString() %></p>
+      <% if (!booking.rating) { %>
+        <form method="POST" action="/bookings/<%= booking._id %>/rate">
+          <label>Rate your guide:</label>
+          <select name="rating" required>
+            <option value="5">🌟🌟🌟🌟🌟</option>
+            <option value="4">🌟🌟🌟🌟</option>
+            <option value="3">🌟🌟🌟</option>
+            <option value="2">🌟🌟</option>
+            <option value="1">🌟</option>
+          </select><br>
+          <textarea name="review" placeholder="Write a review..." rows="2" cols="40"></textarea><br>
+          <button type="submit">Submit Rating</button>
+        </form>
+      <% } else { %>
+        <p><strong>Rating:</strong> <%= booking.rating %>/5</p>
+        <p><em>"<%= booking.review %>"</em></p>
+      <% } %>
+    </div>
+  <% }) %>
+<% } %>
+
+    <a href="/groups/<%= groupId %>/details">← Back to Group Details</a>
+  </div>
+</body>
+</html>

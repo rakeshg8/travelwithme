@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to right, #74ebd5, #acb6e5);
+    }
+
+    .wrapper {
+      display: flex;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 90%;
+      height: 550px;
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .image-side {
+      flex: 1;
+      background: url('/images/travel-login.jpg') center center / cover no-repeat;
+      display: none;
+    }
+
+    .form-side {
+      flex: 1;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-side h2 {
+      margin-bottom: 25px;
+      color: #0077cc;
+      font-size: 2em;
+    }
+
+    form input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+
+    form input:focus {
+      border-color: #0077cc;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .signup-link {
+      margin-top: 20px;
+      font-size: 0.95em;
+      text-align: center;
+    }
+
+    .signup-link a {
+      color: #0077cc;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media screen and (min-width: 768px) {
+      .image-side {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="image-side"></div>
+    <div class="form-side">
+      <h2>🌍 Welcome Back to TravelWithMe</h2>
+      <form method="POST" action="/login">
+        <input name="email" type="email" placeholder="Email Address" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button type="submit">Log In</button>
+      </form>
+      <div class="signup-link">
+        Don’t have an account? <a href="/signup">Sign up here</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
