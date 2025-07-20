@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guide Dashboard</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; padding: 30px; }
+    h1 { color: #1d4ed8; }
+    .section { background: white; padding: 20px; margin: 20px 0; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    button { background: #10b981; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #047857; }
+  </style>
+</head>
+<body>
+  <h1>👨‍🏫 Welcome, <%= guide.name %></h1>
+
+  <div class="section">
+    <h2>📥 Pending Requests</h2>
+    <% if (guide.pendingRequests.length === 0) { %>
+      <p>No pending requests.</p>
+    <% } else { %>
+      <% guide.pendingRequests.forEach((req, i) => { %>
+        <div>
+          <p><strong>User:</strong> <%= req.user.name %> | <strong>Group:</strong> <%= req.group.name %></p>
+          <form method="POST" action="/guide/approve/<%= i %>">
+            <button type="submit">✅ Approve</button>
+          </form>
+        </div>
+        <hr>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <div class="section">
+    <h2>📚 Past Bookings</h2>
+    <% if (bookings.length === 0) { %>
+      <p>No bookings yet.</p>
+    <% } else { %>
+      <% bookings.forEach(b => { %>
+        <div>
+          <p><strong>Group:</strong> <%= b.group.name %> | <strong>User:</strong> <%= b.user.name %></p>
+          <p><strong>Booked On:</strong> <%= new Date(b.bookingDate).toLocaleDateString() %></p>
+          <% if (b.rating) { %>
+            <p>⭐ <%= b.rating %>/5 - "<%= b.review %>"</p>
+          <% } %>
+        </div>
+        <hr>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <a href="/guide/logout">Logout</a>
+</body>
+</html>

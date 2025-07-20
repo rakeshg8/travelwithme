@@ -6,10 +6,7 @@ const Guide = require('../models/Guide');
 const GuideBooking = require('../models/GuideBooking');
 const Notification = require('../models/Notification');
 const GroupLog = require('../models/GroupLog');
-
 const isAdmin = require('../middleware/isAdmin'); // 👈 use middleware
-
-
 router.get('/admin/dashboard', isAdmin, async (req, res) => {
   const [users, groups, guides, bookings, notifications, logs] = await Promise.all([
     User.find(),
@@ -52,6 +49,11 @@ router.post('/admin/groups/:id/delete', isAdmin, async (req, res) => {
     console.error("Error deleting group:", err);
     res.status(500).send("Failed to delete group");
   }
+});
+// Approve a guide
+router.post('/admin/guides/:id/approve', isAdmin, async (req, res) => {
+  await Guide.findByIdAndUpdate(req.params.id, { available: true });
+  res.redirect('/admin/dashboard');
 });
 
   res.render('admin-dashboard', {

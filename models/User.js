@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role: { type: String, default: 'user' } // could be 'user' or 'admin'
+// Example to use: assign this role in DB or on registration
+role: { type: String, default: 'user' } // 'admin' for admin users
 });
 
 module.exports = mongoose.model('User', userSchema);

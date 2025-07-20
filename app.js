@@ -32,13 +32,20 @@ app.use((req, res, next) => {
 // Routes
 const adminRoutes = require('./routes/admin');
 app.use('/', adminRoutes);
+const guideRoutes = require('./routes/guide-auth');
+app.use('/', guideRoutes);
 
 app.use('/', authRoutes);
 app.use('/', groupRoutes);
 app.use('/', profileRoutes);
 const recommendationRoutes = require('./routes/recommendations');
 app.use('/', recommendationRoutes);
+//security
+const helmet = require("helmet");
+const cors = require("cors");
 
+app.use(helmet());
+app.use(cors());
 
 // MongoDB connection
 require('dotenv').config();

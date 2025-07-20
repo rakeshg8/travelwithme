@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login | TravelWithMe</title>
+  <title>Guide Login | TravelWithMe</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     * {
@@ -115,19 +115,18 @@
   <div class="wrapper">
     <div class="image-side"></div>
     <div class="form-side">
-      <h2>🌍 Welcome Back to TravelWithMe</h2>
-      <form method="POST" action="/login">
-        <input name="email" type="email" placeholder="Email Address" required>
+      <h2>👨‍🏫 Guide Login</h2>
+      <form method="POST" action="/guides/login">
+        <input name="email" type="email" placeholder="Guide Email" required>
         <input name="password" type="password" placeholder="Password" required>
         <button type="submit">Log In</button>
       </form>
       <div class="signup-link">
-        Don’t have an account? <a href="/signup">Sign up here</a>
+        Not registered yet? <a href="/guides/register">Register as Guide</a>
       </div>
-<div class="signup-link">
-  Already a guide? <a href="/guides/login">Login as Guide</a>
-</div>
-
+      <div class="signup-link">
+        Regular user? <a href="/login">User Login</a>
+      </div>
     </div>
   </div>
 </body>

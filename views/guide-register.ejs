@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guide Registration | TravelWithMe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dbeafe, #f0f9ff);
+      padding: 50px;
+    }
+    .form-container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      text-align: center;
+      color: #0077cc;
+      margin-bottom: 25px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>📋 Guide Registration</h2>
+    <form method="POST" action="/guides/register">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Create Password" required>
+      <input type="text" name="phone" placeholder="Phone Number" required>
+      <input type="text" name="city" placeholder="City (e.g., Mumbai)" required>
+      <input type="text" name="experience" placeholder="Experience (e.g., 5 years)" required>
+      <input type="number" name="pricePerDay" placeholder="Price Per Day in ₹" required>
+      <button type="submit">Register</button>
+    </form>
+    <p style="text-align:center; margin-top: 15px;">
+      Already a guide? <a href="/guide/login">Login</a>
+    </p>
+  </div>
+</body>
+</html>

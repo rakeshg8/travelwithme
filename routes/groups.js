@@ -229,7 +229,7 @@ router.get('/groups/:id/book-guide', async (req, res) => {
   if (!group) return res.status(404).send('Group not found');
 
   const destination = group.destination;
-  const guides = await Guide.find({ city: destination, available: true });
+  const guides = await Guide.find({ city: { $regex: new RegExp(`^${destination}$`, 'i') }, available: true });
 
   // ✅ Fetch current user's guide bookings for this group
   const bookings = await GuideBooking.find({
@@ -241,25 +241,32 @@ router.get('/groups/:id/book-guide', async (req, res) => {
     guides,
     destination,
     groupId: group._id,
-    bookings // ✅ pass to the view
+    bookings ,// ✅ pass to the view
+      userId: req.session.userId // ✅ add this
   });
 });
 router.post('/groups/:groupId/book-guide/:guideId', async (req, res) => {
-  const { groupId, guideId } = req.params;
+ const { groupId, guideId } = req.params;
 
   const guide = await Guide.findById(guideId);
+
+  // ✅ Check if the user already requested this guide for this group
+  const alreadyRequested = guide.pendingRequests.some(
+    reqObj => reqObj.user.toString() === req.session.userId && reqObj.group.toString() === groupId
+  );
+
+  if (alreadyRequested) return res.send("⚠️ You’ve already requested this guide.");
+
   if (!guide || !guide.available) return res.send("❌ Guide is not available.");
 
-  guide.available = false;
+  // ✅ Add to pendingRequests
+  guide.pendingRequests.push({
+    user: req.session.userId,
+    group: groupId
+  });
   await guide.save();
 
-  await GuideBooking.create({
-    group: groupId,
-    user: req.session.userId,
-    guide: guideId
-  });
-
-  res.send(`✅ Guide ${guide.name} has been booked!`);
+  res.send(`✅ Request sent to guide ${guide.name}. Awaiting approval.`);
 });
 router.get('/my-guide-bookings', async (req, res) => {
   const bookings = await GuideBooking.find({ user: req.session.userId })

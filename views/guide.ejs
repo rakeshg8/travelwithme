@@ -54,9 +54,19 @@
           <p>Phone: <%= guide.phone %></p>
           <p>Experience: <%= guide.experience %></p>
           <p>Price Per Day: ₹<%= guide.pricePerDay %></p>
-          <form method="POST" action="/groups/<%= groupId %>/book-guide/<%= guide._id %>">
-            <button type="submit">Book Guide</button>
-          </form>
+          <% 
+  const alreadyRequested = guide.pendingRequests?.some(req => 
+    req.user && req.user.toString() === userId && req.group && req.group.toString() === groupId.toString()
+  );
+%>
+<% if (alreadyRequested) { %>
+  <button disabled>✅ Request Sent</button>
+<% } else { %>
+  <form method="POST" action="/groups/<%= groupId %>/book-guide/<%= guide._id %>" onsubmit="return confirm('Send request to this guide?');">
+    <button type="submit">Book Guide</button>
+  </form>
+<% } %>
+
         </div>
       <% }) %>
     <% } %>

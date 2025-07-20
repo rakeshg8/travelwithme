@@ -88,8 +88,8 @@ const crypto = require('crypto');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'yramulu613@gmail.com',
-    pass: 'blqn mxsi mmah wyma'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 router.post('/send-otp', async (req, res) => {
