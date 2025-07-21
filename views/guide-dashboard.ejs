@@ -1,53 +1,360 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Guide Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Guide Dashboard | TravelWithMe</title>
+  <link rel="stylesheet" href="/css/style.css">
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; padding: 30px; }
-    h1 { color: #1d4ed8; }
-    .section { background: white; padding: 20px; margin: 20px 0; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    button { background: #10b981; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #047857; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .guide-dashboard-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+    }
+
+    .dashboard-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 40px;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.05) 2px,
+        rgba(255,255,255,0.05) 4px
+      );
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-100px) translateY(-100px); }
+      100% { transform: translateX(100px) translateY(100px); }
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: white;
+      background: none;
+      -webkit-text-fill-color: white;
+      position: relative;
+      z-index: 2;
+    }
+
+    .guide-stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat-item {
+      text-align: center;
+      color: white;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .dashboard-content {
+      background: white;
+      border-radius: 0 0 20px 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-left: 5px solid var(--primary-blue);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--secondary-teal), var(--accent-orange));
+    }
+
+    .dashboard-section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .section-header h2 {
+      color: var(--primary-blue);
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .request-card, .booking-card {
+      background: linear-gradient(135deg, #f8f9ff, #ffffff);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--secondary-teal);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .request-card:hover, .booking-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .request-info, .booking-info {
+      margin-bottom: 15px;
+    }
+
+    .request-info strong, .booking-info strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .request-info p, .booking-info p {
+      margin: 5px 0;
+      color: var(--text-secondary);
+    }
+
+    .action-button {
+      background: linear-gradient(135deg, var(--success-green), #20c997);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .rating-display {
+      background: var(--warning-yellow);
+      color: #856404;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    .logout-section {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid var(--medium-gray);
+    }
+
+    .logout-link {
+      background: linear-gradient(135deg, var(--danger-red), #dc3545);
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        padding: 30px 20px;
+      }
+
+      .dashboard-content {
+        padding: 25px 20px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .guide-stats {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .request-card, .booking-card {
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>👨‍🏫 Welcome, <%= guide.name %></h1>
-
-  <div class="section">
-    <h2>📥 Pending Requests</h2>
-    <% if (guide.pendingRequests.length === 0) { %>
-      <p>No pending requests.</p>
-    <% } else { %>
-      <% guide.pendingRequests.forEach((req, i) => { %>
-        <div>
-          <p><strong>User:</strong> <%= req.user.name %> | <strong>Group:</strong> <%= req.group.name %></p>
-          <form method="POST" action="/guide/approve/<%= i %>">
-            <button type="submit">✅ Approve</button>
-          </form>
+  <div class="guide-dashboard-container">
+    <div class="dashboard-header">
+      <h1>👨‍🏫 Welcome, <%= guide.name %></h1>
+      <div class="guide-stats">
+        <div class="stat-item">
+          <span class="stat-number"><%= guide.pendingRequests.length %></span>
+          <span class="stat-label">Pending Requests</span>
         </div>
-        <hr>
-      <% }) %>
-    <% } %>
-  </div>
+        <div class="stat-item">
+          <span class="stat-number"><%= bookings.length %></span>
+          <span class="stat-label">Total Bookings</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">⭐</span>
+          <span class="stat-label">Professional Guide</span>
+        </div>
+      </div>
+    </div>
 
-  <div class="section">
-    <h2>📚 Past Bookings</h2>
-    <% if (bookings.length === 0) { %>
-      <p>No bookings yet.</p>
-    <% } else { %>
-      <% bookings.forEach(b => { %>
-        <div>
-          <p><strong>Group:</strong> <%= b.group.name %> | <strong>User:</strong> <%= b.user.name %></p>
-          <p><strong>Booked On:</strong> <%= new Date(b.bookingDate).toLocaleDateString() %></p>
-          <% if (b.rating) { %>
-            <p>⭐ <%= b.rating %>/5 - "<%= b.review %>"</p>
+    <div class="dashboard-content">
+      <div class="dashboard-grid">
+        <!-- Pending Requests Section -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h2>📥 Pending Requests</h2>
+          </div>
+          
+          <% if (guide.pendingRequests.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-state-icon">📪</div>
+              <p>No pending requests at the moment.</p>
+            </div>
+          <% } else { %>
+            <% guide.pendingRequests.forEach((req, i) => { %>
+              <div class="request-card">
+                <div class="request-info">
+                  <p><strong>User:</strong> <%= req.user.name %></p>
+                  <p><strong>Email:</strong> <%= req.user.email %></p>
+                  <p><strong>Group:</strong> <%= req.group.name %></p>
+                  <p><strong>Destination:</strong> <%= req.group.destination %></p>
+                </div>
+                <form method="POST" action="/guide/approve/<%= i %>">
+                  <button type="submit" class="action-button">
+                    ✅ Approve Request
+                  </button>
+                </form>
+              </div>
+            <% }) %>
           <% } %>
         </div>
-        <hr>
-      <% }) %>
-    <% } %>
-  </div>
 
-  <a href="/guide/logout">Logout</a>
+        <!-- Past Bookings Section -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h2>📚 Past Bookings</h2>
+          </div>
+          
+          <% if (bookings.length === 0) { %>
+            <div class="empty-state">
+              <div class="empty-state-icon">📖</div>
+              <p>No bookings yet. Start building your reputation!</p>
+            </div>
+          <% } else { %>
+            <% bookings.forEach(b => { %>
+              <div class="booking-card">
+                <div class="booking-info">
+                  <p><strong>Group:</strong> <%= b.group.name %></p>
+                  <p><strong>User:</strong> <%= b.user.name %></p>
+                  <p><strong>Destination:</strong> <%= b.group.destination %></p>
+                  <p><strong>Booked On:</strong> <%= new Date(b.bookingDate).toLocaleDateString() %></p>
+                  <% if (b.rating) { %>
+                    <div class="rating-display">
+                      ⭐ <%= b.rating %>/5 - "<%= b.review %>"
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="logout-section">
+        <a href="/guide/logout" class="logout-link">
+          🚪 Logout
+        </a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
