@@ -1,31 +1,323 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Your Profile | TravelWithMe</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .profile-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 40px;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.05) 2px,
+        rgba(255,255,255,0.05) 4px
+      );
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-100px) translateY(-100px); }
+      100% { transform: translateX(100px) translateY(100px); }
+    }
+
+    .profile-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: white;
+      background: none;
+      -webkit-text-fill-color: white;
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      z-index: 3;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .profile-content {
+      background: white;
+      border-radius: 0 0 20px 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .profile-info-section {
+      background: linear-gradient(135deg, #f8f9ff, #e6f3ff);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-left: 5px solid var(--primary-blue);
+    }
+
+    .profile-info-section h2 {
+      color: var(--primary-blue);
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .info-item {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-left: 3px solid var(--secondary-teal);
+    }
+
+    .info-item label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .info-item .value {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .edit-form-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      border: 1px solid var(--medium-gray);
+    }
+
+    .edit-form-section h2 {
+      color: var(--primary-blue);
+      margin-bottom: 25px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid var(--medium-gray);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-teal));
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(0, 119, 204, 0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 119, 204, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat-item {
+      text-align: center;
+      color: white;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+      .profile-header {
+        padding: 30px 20px;
+      }
+
+      .profile-content {
+        padding: 25px 20px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-stats {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .back-link {
+        position: static;
+        display: inline-block;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>👤 Your Profile</h1>
-    <a href="/dashboard">← Back to Dashboard</a>
+  <div class="profile-container">
+    <div class="profile-header">
+      <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+      <h1>👤 Your Profile</h1>
+      <div class="profile-stats">
+        <div class="stat-item">
+          <span class="stat-number">🌟</span>
+          <span class="stat-label">Member</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">✈️</span>
+          <span class="stat-label">Explorer</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">🤝</span>
+          <span class="stat-label">Connector</span>
+        </div>
+      </div>
+    </div>
 
-    <h2>Profile Info</h2>
-    <p><strong>Name:</strong> <%= user.name %></p>
-    <p><strong>Email:</strong> <%= user.email %></p>
+    <div class="profile-content">
+      <div class="profile-info-section">
+        <h2>📋 Profile Information</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Full Name</label>
+            <div class="value"><%= user.name %></div>
+          </div>
+          <div class="info-item">
+            <label>Email Address</label>
+            <div class="value"><%= user.email %></div>
+          </div>
+        </div>
+      </div>
 
-    <h2>Edit Your Bio & Preferences</h2>
-    <form method="POST" action="/profile">
-      <label>Bio:</label><br>
-      <textarea name="bio" rows="3" cols="50"><%= user.bio %></textarea><br>
+      <div class="edit-form-section">
+        <h2>✏️ Edit Your Bio & Preferences</h2>
+        <form method="POST" action="/profile">
+          <div class="form-group">
+            <label for="bio">📝 Bio</label>
+            <textarea name="bio" id="bio" placeholder="Tell other travelers about yourself..." rows="4"><%= user.bio || '' %></textarea>
+          </div>
 
-      <label>Interests:</label><br>
-      <input name="interests" value="<%= user.interests %>"><br>
+          <div class="form-group">
+            <label for="interests">🎯 Interests</label>
+            <input type="text" name="interests" id="interests" value="<%= user.interests || '' %>" placeholder="e.g., Adventure, Culture, Food, Photography">
+          </div>
 
-      <label>Preferred Destinations:</label><br>
-      <input name="preferredDestinations" value="<%= user.preferredDestinations %>"><br>
+          <div class="form-group">
+            <label for="preferredDestinations">🗺️ Preferred Destinations</label>
+            <input type="text" name="preferredDestinations" id="preferredDestinations" value="<%= user.preferredDestinations || '' %>" placeholder="e.g., Mountains, Beaches, Cities, Wildlife">
+          </div>
 
-      <button type="submit">Update Profile</button>
-    </form>
+          <button type="submit" class="submit-btn">💾 Update Profile</button>
+        </form>
+      </div>
+    </div>
   </div>
 </body>
 </html>

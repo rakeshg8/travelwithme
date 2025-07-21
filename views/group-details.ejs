@@ -1,194 +1,481 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Group Admin Panel | <%= group.name %></title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 40px;
-      background: linear-gradient(to right, #dbeafe, #f0f9ff);
-      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
     }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      font-size: 2em;
-      color: #1d4ed8;
-      margin-bottom: 10px;
-    }
-
-    h3 {
-      margin-top: 0;
-      color: #555;
-    }
-
-    section {
-      margin-top: 40px;
-    }
-
-    section h2 {
-      color: #2563eb;
-      border-bottom: 2px solid #c7d2fe;
-      padding-bottom: 6px;
-    }
-
-    ul {
-      list-style: none;
+    .group-details-container {
+      max-width: 1200px;
+      margin: 40px auto;
       padding: 0;
+      background: none;
+      box-shadow: none;
     }
 
-    li {
-      background: #f8fafc;
-      padding: 15px 20px;
-      margin-bottom: 12px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    .group-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 40px;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .group-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.05) 2px,
+        rgba(255,255,255,0.05) 4px
+      );
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-100px) translateY(-100px); }
+      100% { transform: translateX(100px) translateY(100px); }
+    }
+
+    .group-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: white;
+      background: none;
+      -webkit-text-fill-color: white;
+      position: relative;
+      z-index: 2;
+    }
+
+    .group-info {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+      opacity: 0.95;
+    }
+
+    .group-content {
+      background: white;
+      border-radius: 0 0 20px 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .admin-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      border-left: 5px solid var(--primary-blue);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .admin-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--secondary-teal), var(--accent-orange));
+    }
+
+    .admin-section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .section-header h2 {
+      color: var(--primary-blue);
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 12px 18px;
+      border: 2px solid var(--medium-gray);
+      border-radius: 25px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.1);
+    }
+
+    .member-card, .request-card {
+      background: linear-gradient(135deg, #f8f9ff, #ffffff);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--secondary-teal);
+      transition: all 0.3s ease;
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      gap: 15px;
     }
 
-    .user-info {
+    .member-card:hover, .request-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .member-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .member-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .member-email {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .member-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.9rem;
       font-weight: 500;
-      margin-right: 15px;
-      flex-grow: 1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
     }
 
-    form {
+    .approve-btn {
+      background: linear-gradient(135deg, var(--success-green), #20c997);
+      color: white;
+    }
+
+    .message-btn {
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-teal));
+      color: white;
+    }
+
+    .remove-btn {
+      background: linear-gradient(135deg, var(--danger-red), #dc3545);
+      color: white;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .remove-form {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .remove-input {
+      padding: 6px 12px;
+      border: 2px solid var(--medium-gray);
+      border-radius: 15px;
+      font-size: 0.85rem;
+      min-width: 150px;
+    }
+
+    .remove-input:focus {
+      outline: none;
+      border-color: var(--danger-red);
+    }
+
+    .log-card {
+      background: linear-gradient(135deg, #fff8f4, #ffffff);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--accent-orange);
+      transition: all 0.3s ease;
+    }
+
+    .log-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .log-action {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .log-details {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .log-timestamp {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    .navigation-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid var(--medium-gray);
+    }
+
+    .nav-link {
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-teal));
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
-    input[type="text"], input[name="reason"] {
-      padding: 8px 12px;
-      font-size: 0.9em;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 119, 204, 0.3);
     }
 
-    button {
-      padding: 8px 14px;
-      font-size: 0.9em;
-      background-color: #3b82f6;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
+    @media (max-width: 768px) {
+      .group-header {
+        padding: 30px 20px;
+      }
 
-    button:hover {
-      background-color: #1e40af;
-    }
+      .group-content {
+        padding: 25px 20px;
+      }
 
-    button.remove {
-      background-color: #ef4444;
-    }
+      .member-card, .request-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-    button.remove:hover {
-      background-color: #b91c1c;
-    }
+      .member-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
 
-    .back-link {
-      display: inline-block;
-      margin-top: 30px;
-      text-decoration: none;
-      color: #2563eb;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
+      .remove-form {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+      }
 
-    .back-link:hover {
-      color: #1e3a8a;
-    }
+      .remove-input {
+        min-width: auto;
+      }
 
-    .empty-message {
-      font-style: italic;
-      color: #666;
-      padding: 10px;
+      .navigation-links {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="group-details-container">
+    <div class="group-header">
+      <h1>👑 Group: <%= group.name %></h1>
+      <div class="group-info">
+        📍 Destination: <%= group.destination %> | 📅 Date: <%= group.date.toDateString() %>
+      </div>
+    </div>
 
-  <h1>👑 Group : <%= group.name %></h1>
-  <h3>📍 Destination: <%= group.destination %> | 📅 Date: <%= group.date.toDateString() %></h3>
-
-  <section>
-    <h2>🟡 Pending Requests</h2>
-    <% if (group.pendingRequests.length === 0) { %>
-      <p>No pending requests</p>
-    <% } else { %>
-      <ul>
-        <% group.pendingRequests.forEach(user => { %>
-          <li>
-            <strong><%= user.name %></strong> - <%= user.email %>
-            <form method="POST" action="/groups/<%= group._id %>/approve/<%= user._id %>">
-              <button type="submit">✅ Approve</button>
-            </form>
-          </li>
-        <% }) %>
-      </ul>
-    <% } %>
-  </section>
-
-  <section>
-    <h2>✅ Approved Members</h2>
-    <input id="searchInput" class="search-bar" type="text" placeholder="Search members..." onkeyup="filterUsers()">
-    <ul class="member-list">
-      <% group.members.forEach(user => { %>
-        <li>
-          <%= user.name %> - <%= user.email %>
-          <button onclick="alert('This would open a message modal to <%= user.name %>')">💬 Message</button>
-          <% if (user._id.toString() !== userId.toString()) { %>
-            <form method="POST" action="/groups/<%= group._id %>/remove/<%= user._id %>" style="display:inline;">
-              <input name="reason" placeholder="Reason for removal" required>
-              <button class="remove-btn" type="submit">❌ Remove</button>
-            </form>
-          <% } %>
-        </li>
-      <% }) %>
-    </ul>
-  </section>
-
-  <section>
-    <h2>🧾 Admin Action Logs</h2>
-    <% if (logs.length === 0) { %>
-      <p>No actions recorded yet.</p>
-    <% } else { %>
-      <% logs.forEach(log => { %>
-        <div class="log-box">
-          <strong><%= log.action === 'approve' ? '✅ Approved' : '❌ Removed' %></strong>
-          <%= log.targetUser.name %> by <%= log.admin.name %>
-          <% if (log.reason) { %> — Reason: "<%= log.reason %>" <% } %><br>
-          <small><%= new Date(log.timestamp).toLocaleString() %></small>
+    <div class="group-content">
+      <!-- Pending Requests Section -->
+      <div class="admin-section">
+        <div class="section-header">
+          <h2>🟡 Pending Requests</h2>
         </div>
-      <% }) %>
-    <% } %>
-  </section>
+        
+        <% if (group.pendingRequests.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">📪</div>
+            <p>No pending requests at the moment.</p>
+          </div>
+        <% } else { %>
+          <% group.pendingRequests.forEach(user => { %>
+            <div class="request-card">
+              <div class="member-info">
+                <div class="member-name"><%= user.name %></div>
+                <div class="member-email"><%= user.email %></div>
+              </div>
+              <div class="member-actions">
+                <form method="POST" action="/groups/<%= group._id %>/approve/<%= user._id %>">
+                  <button type="submit" class="action-btn approve-btn">
+                    ✅ Approve
+                  </button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
 
- <a href="/groups/<%= group._id %>/recommendations" class="back-link">🌟 View Recommendations</a>
- <br>
- <a href="/groups/<%= group._id %>/book-guide" class="back-link">🧭 Book a Guide</a>
-    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+      <!-- Approved Members Section -->
+      <div class="admin-section">
+        <div class="section-header">
+          <h2>✅ Approved Members</h2>
+        </div>
+        
+        <input id="searchInput" class="search-bar" type="text" placeholder="🔍 Search members..." onkeyup="filterUsers()">
+        
+        <ul class="member-list" style="list-style: none; padding: 0;">
+          <% group.members.forEach(user => { %>
+            <li>
+              <div class="member-card">
+                <div class="member-info">
+                  <div class="member-name"><%= user.name %></div>
+                  <div class="member-email"><%= user.email %></div>
+                </div>
+                <div class="member-actions">
+                  <button onclick="alert('This would open a message modal to <%= user.name %>')" class="action-btn message-btn">
+                    💬 Message
+                  </button>
+                  <% if (user._id.toString() !== userId.toString()) { %>
+                    <form method="POST" action="/groups/<%= group._id %>/remove/<%= user._id %>" class="remove-form">
+                      <input name="reason" placeholder="Reason for removal" class="remove-input" required>
+                      <button class="action-btn remove-btn" type="submit">
+                        ❌ Remove
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <!-- Admin Action Logs Section -->
+      <div class="admin-section">
+        <div class="section-header">
+          <h2>🧾 Admin Action Logs</h2>
+        </div>
+        
+        <% if (logs.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p>No actions recorded yet.</p>
+          </div>
+        <% } else { %>
+          <% logs.forEach(log => { %>
+            <div class="log-card">
+              <div class="log-action">
+                <%= log.action === 'approve' ? '✅ Approved' : '❌ Removed' %> <%= log.targetUser.name %>
+              </div>
+              <div class="log-details">
+                by <%= log.admin.name %>
+                <% if (log.reason) { %> — Reason: "<%= log.reason %>" <% } %>
+              </div>
+              <div class="log-timestamp">
+                <%= new Date(log.timestamp).toLocaleString() %>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <div class="navigation-links">
+        <a href="/groups/<%= group._id %>/recommendations" class="nav-link">
+          🌟 View Recommendations
+        </a>
+        <a href="/groups/<%= group._id %>/book-guide" class="nav-link">
+          🧭 Book a Guide
+        </a>
+        <a href="/dashboard" class="nav-link">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
   </div>
+
+  <script>
+    function filterUsers() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const memberList = document.querySelector('.member-list');
+      const members = memberList.getElementsByTagName('li');
+      
+      for (let i = 0; i < members.length; i++) {
+        const memberCard = members[i].querySelector('.member-card');
+        const name = memberCard.querySelector('.member-name').textContent.toLowerCase();
+        const email = memberCard.querySelector('.member-email').textContent.toLowerCase();
+        
+        if (name.includes(filter) || email.includes(filter)) {
+          members[i].style.display = '';
+        } else {
+          members[i].style.display = 'none';
+        }
+      }
+    }
+  </script>
 </body>
 </html>
